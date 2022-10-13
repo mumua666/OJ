@@ -2,7 +2,7 @@ import java.util.LinkedHashSet;
 import java.util.Scanner;
 
 /** @author Linux_Mumu */
-public class Exp20220603 {
+public class Main {
     static class Role {
         String roleName;
         LinkedHashSet<String> operationName;
