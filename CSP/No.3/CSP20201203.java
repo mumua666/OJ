@@ -2,18 +2,18 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /** @author : 朱晓隆 2021150174 */
-public class Exp20201203 {
+public class Main {
     public static boolean check(int sizeA, int sizeB) {
         return sizeA > sizeB;
     }
 
     public static class Path {
         String name;
-        int sizeSelf = 0, sizeSon = 0, sizeOffSpring = 0, sizeSonMax = 0, sizeOffSpringMax = 0;
+        long sizeSelf = 0, sizeSon = 0, sizeOffSpring = 0, sizeSonMax = 0, sizeOffSpringMax = 0;
         boolean isFile = true;
         ArrayList<Path> listPath = new ArrayList<>();
 
-        Path(String name, int sizeSelf) {
+        Path(String name, long sizeSelf) {
             this.name = name;
             this.sizeSelf = sizeSelf;
         }
@@ -23,18 +23,15 @@ public class Exp20201203 {
             this.isFile = isFile;
         }
 
-        void set(int sizeSonMax, int sizeOffSpringMax) {
-            this.sizeSonMax = sizeSonMax;
-            this.sizeOffSpringMax = sizeOffSpringMax;
-        }
-
         boolean isFilePath(String[] strArray) {
             Path temp = this;
-            for (String itemArrsy : strArray) {
+            String itemArray;
+            for (int i = 0; i < strArray.length; i++) {
+                itemArray = strArray[i];
                 for (Path itemPath : temp.listPath) {
-                    if (itemPath.name.equals(itemArrsy)) {
+                    if (itemPath.name.equals(itemArray)) {
                         temp = itemPath;
-                        if (temp.isFile && temp.name.equals(strArray[strArray.length - 1])) {
+                        if (temp.isFile && i == strArray.length - 1) {
                             return true;
                         }
                         break;
@@ -44,7 +41,7 @@ public class Exp20201203 {
             return false;
         }
 
-        boolean canDo(String[] strArray, int size) {
+        boolean canDo(String[] strArray, long size) {
             Path temp = this;
             boolean exits = false;
             boolean flag;
@@ -77,13 +74,15 @@ public class Exp20201203 {
                     return true;
                 }
             }
-            return !exits;
+            return true;
         }
 
-        void saveFile(String[] strArray, int size) {
+        void saveFile(String[] strArray, long size) {
             Path temp = this;
             boolean exits = false;
-            for (String itemArray : strArray) {
+            String itemArray;
+            for (int i = 0; i < strArray.length; i++) {
+                itemArray = strArray[i];
                 exits = false;
                 for (Path itemPath : temp.listPath) {
                     if (itemPath.name.equals(itemArray)) {
@@ -93,7 +92,7 @@ public class Exp20201203 {
                         break;
                     }
                 }
-                if (!exits && itemArray != strArray[strArray.length - 1]) {
+                if (!exits && i != strArray.length - 1) {
                     temp.listPath.add(new Path(itemArray, false));
                     temp.sizeOffSpring += size;
                     for (Path itemPath : temp.listPath) {
@@ -135,7 +134,7 @@ public class Exp20201203 {
             return true;
         }
 
-        int getSize(String[] strArray) {
+        long getSize(String[] strArray) {
             Path temp = this;
             for (String itemArrsy : strArray) {
                 for (Path itemPath : temp.listPath) {
@@ -152,18 +151,21 @@ public class Exp20201203 {
             }
         }
 
-        void removePath(String[] strArray, int size) {
+        void removePath(String[] strArray, long size) {
             Path temp = this;
-            for (String itemArrsy : strArray) {
+            String itemArray;
+            for (int i = 0; i < strArray.length; i++) {
+                itemArray = strArray[i];
                 for (Path itemPath : temp.listPath) {
-                    if (itemPath.name.equals(itemArrsy)) {
+                    if (itemPath.name.equals(itemArray)) {
                         temp.sizeOffSpring -= size;
-                        if (itemArrsy.equals(strArray[strArray.length - 1])) {
+                        if (i == strArray.length - 1) {
                             if (itemPath.isFile) {
                                 temp.sizeSon -= size;
                             }
                             temp.listPath.remove(itemPath);
-                            return;
+                            itemPath.listPath.clear();
+                            break;
                         } else {
                             temp = itemPath;
                         }
@@ -173,9 +175,14 @@ public class Exp20201203 {
             }
         }
 
-        boolean canSet(String[] strArray, int sizeSonMax, int sizeOffSpringMax) {
+        boolean canSet(String[] strArray, long sizeSonMax, long sizeOffSpringMax) {
             Path temp = this;
             for (String itemArrsy : strArray) {
+                boolean flag = temp.sizeOffSpringMax != 0 && (temp.sizeOffSpringMax < sizeOffSpringMax
+                        || sizeOffSpringMax == 0);
+                if (flag) {
+                    return false;
+                }
                 for (Path itemPath : temp.listPath) {
                     if (itemPath.name.equals(itemArrsy)) {
                         temp = itemPath;
@@ -195,7 +202,7 @@ public class Exp20201203 {
             }
         }
 
-        void setSize(String[] strArray, int sizeSonMax, int sizeOffSpringMax) {
+        void setSize(String[] strArray, long sizeSonMax, long sizeOffSpringMax) {
             Path temp = this;
             for (String itemArrsy : strArray) {
                 for (Path itemPath : temp.listPath) {
@@ -212,22 +219,22 @@ public class Exp20201203 {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
+        long n = sc.nextLong();
         String cmd, filePath;
-        int size, sizeSonMax, sizeOffSpringMax;
+        long size, sizeSonMax, sizeOffSpringMax;
         Path path = new Path("/", false);
-        for (int i = 0; i < n; i++) {
+        for (long i = 0; i < n; i++) {
             cmd = sc.next();
             if ("C".equals(cmd)) {
                 filePath = sc.next();
-                size = sc.nextInt();
+                size = sc.nextLong();
                 String[] strArray = filePath.split("/");
                 String[] strArrayNew = new String[strArray.length - 1];
                 for (int j = 0; j < strArray.length - 1; j++) {
                     strArrayNew[j] = strArray[j + 1];
                 }
                 boolean remove = false;
-                int sizeOld = 0;
+                long sizeOld = 0;
                 if (path.findPath(strArrayNew) && path.isFilePath(strArrayNew)) {
                     sizeOld = path.getSize(strArrayNew);
                     path.removePath(strArrayNew, sizeOld);
@@ -257,8 +264,8 @@ public class Exp20201203 {
 
             } else if ("Q".equals(cmd)) {
                 filePath = sc.next();
-                sizeSonMax = sc.nextInt();
-                sizeOffSpringMax = sc.nextInt();
+                sizeSonMax = sc.nextLong();
+                sizeOffSpringMax = sc.nextLong();
 
                 if (!filePath.equals("/")) {
                     String[] strArray = filePath.split("/");
@@ -266,7 +273,8 @@ public class Exp20201203 {
                     for (int j = 0; j < strArray.length - 1; j++) {
                         strArrayNew[j] = strArray[j + 1];
                     }
-                    if (path.canSet(strArrayNew, sizeSonMax, sizeOffSpringMax) && path.findPath(strArrayNew)) {
+                    if (path.findPath(strArrayNew) && path.canSet(strArrayNew, sizeSonMax,
+                            sizeOffSpringMax)) {
                         System.out.println("Y");
                         path.setSize(strArray, sizeSonMax, sizeOffSpringMax);
                     } else {
